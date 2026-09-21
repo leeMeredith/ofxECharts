@@ -191,7 +191,7 @@ h1 {
 
 .chart-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(340px, 0.9fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
   align-items: stretch;
 }
@@ -202,6 +202,10 @@ h1 {
   border: 1px solid #252c38;
   border-radius: 18px;
   background: rgba(20, 25, 34, 0.78);
+}
+
+.chart-card[data-chart-id="signal-history"] {
+  grid-column: 1 / -1;
 }
 
 .chart-card-header {
@@ -241,6 +245,10 @@ h1 {
 
 .chart {
   width: 100%;
+  height: 390px;
+}
+
+.chart-card[data-chart-id="signal-history"] .chart {
   height: 440px;
 }
 
@@ -266,6 +274,10 @@ code {
 
   .chart-grid {
     grid-template-columns: 1fr;
+  }
+
+  .chart-card[data-chart-id="signal-history"] {
+    grid-column: auto;
   }
 }
 
@@ -297,6 +309,10 @@ code {
   }
 
   .chart {
+    height: 410px;
+  }
+
+  .chart-card[data-chart-id="signal-history"] .chart {
     height: 410px;
   }
 }
@@ -344,6 +360,10 @@ code {
   }
 
   .chart {
+    height: 340px;
+  }
+
+  .chart-card[data-chart-id="signal-history"] .chart {
     height: 340px;
   }
 }

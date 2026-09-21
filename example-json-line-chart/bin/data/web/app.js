@@ -13,6 +13,27 @@
     splitLine: { lineStyle: { color: "#222a36" } }
   };
 
+  function latestSignalDataset(snapshot) {
+    const { dimensions, source } = snapshot.dataset;
+    const latestRow = source[source.length - 1];
+    if (!latestRow) {
+      return { dimensions: ["signal", "value"], source: [] };
+    }
+
+    const valueFor = (dimension) => {
+      const value = latestRow[dimensions.indexOf(dimension)];
+      return typeof value === "number" ? value : null;
+    };
+
+    return {
+      dimensions: ["signal", "value"],
+      source: [
+        ["Brightness", valueFor("brightness")],
+        ["Movement", valueFor("movement")]
+      ]
+    };
+  }
+
   // Add another entry here to create another chart from the same snapshot.
   const chartConfigs = [
     {
@@ -41,7 +62,11 @@
             min: "dataMin",
             max: "dataMax",
             name: "time",
-            ...axisStyle
+            ...axisStyle,
+            axisLabel: {
+              color: "#7f8998",
+              formatter: (value) => Number(value).toFixed(1).replace(/\.0$/, "")
+            }
           },
           yAxis: {
             type: "value",
@@ -104,6 +129,56 @@
           }]
         };
       }
+    },
+    {
+      id: "current-values",
+      title: "Current values",
+      description: "The latest brightness and movement values from the shared snapshot.",
+      fileStem: "current-values",
+      requiredDimensions: ["brightness", "movement"],
+      buildOption(snapshot) {
+        return {
+          animationDurationUpdate: 240,
+          backgroundColor: "transparent",
+          dataset: latestSignalDataset(snapshot),
+          grid: { left: 54, right: 24, top: 36, bottom: 52 },
+          tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+          xAxis: {
+            type: "category",
+            axisLabel: { color: "#7f8998" },
+            axisLine: { lineStyle: { color: "#364051" } },
+            splitLine: { show: false }
+          },
+          yAxis: {
+            type: "value",
+            min: 0,
+            max: 1,
+            ...axisStyle
+          },
+          series: [{
+            id: "current-signal-values",
+            type: "bar",
+            barMaxWidth: 92,
+            encode: { x: "signal", y: "value" },
+            itemStyle: {
+              borderRadius: [7, 7, 0, 0],
+              color: (params) => params.dataIndex === 0 ? "#52d6bc" : "#ffae52"
+            },
+            label: {
+              show: true,
+              position: "top",
+              color: "#dfe5ef",
+              formatter: (params) => {
+                const value = params.value[1];
+                return typeof value === "number" ? value.toFixed(2) : "—";
+              }
+            }
+          }]
+        };
+      },
+      buildUpdate(snapshot) {
+        return { dataset: latestSignalDataset(snapshot) };
+      }
     }
   ];
 
@@ -138,6 +213,7 @@
     return chartConfigs.map((config) => {
       const card = document.createElement("article");
       card.className = "chart-card";
+      card.dataset.chartId = config.id;
 
       const heading = document.createElement("div");
       heading.className = "chart-card-header";
@@ -224,7 +300,10 @@
       if (nextDimensionsKey !== dimensionsKey) {
         view.chart.setOption(view.config.buildOption(snapshot), { notMerge: true, lazyUpdate: true });
       } else {
-        view.chart.setOption({ dataset: snapshot.dataset }, { notMerge: false, lazyUpdate: true });
+        const update = view.config.buildUpdate
+          ? view.config.buildUpdate(snapshot)
+          : { dataset: snapshot.dataset };
+        view.chart.setOption(update, { notMerge: false, lazyUpdate: true });
       }
       view.exportButton.disabled = false;
     }

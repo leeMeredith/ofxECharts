@@ -10,7 +10,7 @@ This implementation intentionally contains no HTTP server, socket, cloud synchro
 
 ## Included example
 
-`example-json-line-chart` generates two signals, retains 200 samples, publishes every 500 ms, and displays them in OF and in an automatically updating ECharts dashboard. The dashboard shows a time-series chart and a brightness-versus-movement scatter chart from the same snapshot and the same browser request.
+`example-json-line-chart` generates two signals, retains 200 samples, publishes every 500 ms, and displays them in OF and in an automatically updating ECharts dashboard. The dashboard shows a time-series chart, a brightness-versus-movement scatter chart, and a current-values bar chart from the same snapshot and the same browser request.
 
 The publisher validates dimensions and rows, writes a temporary file in the destination directory, and replaces the public snapshot. Temporary Windows sharing failures are retried on later OF updates without sleeping on the main thread. Each successful publication receives a sequence ID and UTC timestamp.
 
@@ -38,7 +38,7 @@ The dashboard accepts a same-origin JSON path or a full CORS-enabled URL in **Da
 
 Each chart has an **Export PNG** action. **Print dashboard** opens the browser's print dialog for printing or saving the complete view as PDF. Exported image filenames include the snapshot sequence ID.
 
-Both supplied charts are described by the `chartConfigs` array near the beginning of `app.js`. Add another entry with a title, required dimensions, and an ECharts option builder to render a third chart. The shared poller validates and distributes one snapshot to every configured chart.
+All supplied charts are described by the `chartConfigs` array near the beginning of `app.js`. Add another entry with a title, required dimensions, and an ECharts option builder to render another chart. A chart that derives a different dataset from the snapshot can also provide `buildUpdate`, as demonstrated by the current-values bar chart. The shared poller validates and distributes one snapshot to every configured chart.
 
 ## Use it in a Project Generator app
 
@@ -107,8 +107,8 @@ The add-on is MIT licensed. See `LICENSE`.
 ## Next verification
 
 - Repeatedly read while OF replaces the snapshot and confirm that readers receive complete JSON. The initial macOS check completed 91,774 reads with no malformed JSON while sequence IDs advanced from 31 through 36.
-- Exercise startup and restart in every order: browser, server, and OF.
+- The macOS recovery matrix passed for OF and server restarts, first-snapshot waiting, paused and manual refresh, missing and invalid sources, shorter datasets, and empty datasets.
 - Measure publication cost at the documented 200-row workload.
 - Verify macOS first, then Windows replacement and retry behavior before claiming Windows support.
 
-The example currently compiles and links with openFrameworks 0.12.1 on macOS 26.7 using Apple clang 21.0.0. The local serving check used Python 3.13.7 and returned the HTML page, live 200-row snapshot, and bundled ECharts file successfully. The browser rendering pass displayed both series without console warnings. The restart matrix remains to be completed.
+The example currently compiles and links with openFrameworks 0.12.1 on macOS 26.7 using Apple clang 21.0.0. The local serving check used Python 3.13.7 and returned the HTML page, live 200-row snapshot, and bundled ECharts file successfully. Browser rendering and the recovery matrix completed without console warnings.
