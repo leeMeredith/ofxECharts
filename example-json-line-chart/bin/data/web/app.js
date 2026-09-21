@@ -64,6 +64,9 @@
       tooltip: { trigger: "axis" },
       xAxis: {
         type: "value",
+        scale: true,
+        min: "dataMin",
+        max: "dataMax",
         name: chartConfig.x,
         nameTextStyle: { color: "#7f8998" },
         axisLabel: { color: "#7f8998" },
