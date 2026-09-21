@@ -1,0 +1,9 @@
+**/obj/
+**/bin/*.app/
+**/bin/*.exe
+**/bin/data/web/data.json
+**/bin/data/web/data.json.tmp
+**/*.xcodeproj/project.xcworkspace/xcuserdata/
+**/*.xcodeproj/xcuserdata/
+**/*.xcuserstate
+.DS_Store

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ofxECharts — local data view</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">OPENFRAMEWORKS / LOCAL JSON</p>
+        <h1>Generated signals</h1>
+      </div>
+      <div class="status-panel" aria-live="polite">
+        <span id="status-dot" class="status-dot waiting"></span>
+        <span id="status">Waiting for data</span>
+      </div>
+    </header>
+
+    <section class="metadata">
+      <div><span>Sequence</span><strong id="sequence">—</strong></div>
+      <div><span>Published</span><strong id="published">—</strong></div>
+      <div><span>Age</span><strong id="age">—</strong></div>
+      <div><span>Unseen publications</span><strong id="unseen">0</strong></div>
+    </section>
+
+    <section class="chart-card">
+      <div id="chart" role="img" aria-label="Line chart of generated openFrameworks values"></div>
+    </section>
+
+    <footer>
+      Polling <code>data.json</code> every 500 ms. The last valid chart remains visible if updates stop.
+    </footer>
+  </main>
+
+  <script src="./vendor/echarts.min.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

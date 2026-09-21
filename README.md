@@ -1,0 +1,95 @@
+# ofxECharts
+
+First working implementation of a small openFrameworks companion for Apache ECharts. The OF side publishes a complete JSON snapshot. A separate static server exposes the snapshot and supplied browser example.
+
+```text
+openFrameworks → data.json → local static server → browser fetch() → ECharts
+```
+
+This implementation intentionally contains no HTTP server, socket, cloud synchronization, or browser-to-OF control path.
+
+## Included example
+
+`example-json-line-chart` generates two signals, retains 200 samples, publishes every 500 ms, and displays them in OF and in an automatically updating ECharts page.
+
+The publisher validates dimensions and rows, writes a temporary file in the destination directory, and replaces the public snapshot. Temporary Windows sharing failures are retried on later OF updates without sleeping on the main thread. Each successful publication receives a sequence ID and UTC timestamp.
+
+The browser makes one request at a time, bypasses its cache, validates responses, and keeps the last valid chart when publication stops.
+
+## Run the example
+
+1. Place or clone `ofxECharts` at `OF_ROOT/addons/ofxECharts`.
+2. Generate or open `example-json-line-chart` and run it.
+3. From the example directory, start a local server:
+
+   ```sh
+   python3 -m http.server 8000 --bind 127.0.0.1 --directory bin/data/web
+   ```
+
+   On Windows, `py -3` can replace `python3`.
+
+4. Open <http://127.0.0.1:8000/>.
+
+Opening `index.html` directly through `file://` will usually prevent the page from fetching `data.json`; use the local address.
+
+## Minimal C++ use
+
+```cpp
+ofxECharts publisher;
+
+void ofApp::setup() {
+    publisher.setup("web/data.json", 500);
+}
+
+void ofApp::update() {
+    ofJson rows = {
+        {0.0, 0.42, 0.12},
+        {0.1, 0.46, 0.18}
+    };
+    publisher.setDataset({"time", "brightness", "movement"}, rows);
+    publisher.update();
+}
+```
+
+In an actual sketch, update the dataset when samples change rather than rebuilding it unnecessarily every frame. Call `publisher.update()` every frame so scheduled publication and deferred replacement retries can run.
+
+## Snapshot format
+
+```json
+{
+  "publishedAt": "2026-09-21T14:00:00.000Z",
+  "sequenceId": 42,
+  "dataset": {
+    "dimensions": ["time", "brightness", "movement"],
+    "source": [
+      [0.0, 0.42, 0.12],
+      [0.1, 0.46, 0.18]
+    ]
+  }
+}
+```
+
+Every row must contain one value per unique dimension. Cells may contain strings, booleans, finite numbers, or `null`.
+
+`sequenceId` counts successful publications. A browser may skip IDs because polling and publication run independently; skipped IDs do not necessarily mean samples were lost because each snapshot can contain a history.
+
+## Current boundary
+
+The example is a local observation tool. The browser owns chart type, axes, series mappings, labels, and styling in `app.js`. The add-on knows only the dataset contract.
+
+The initial implementation supports one writer and one snapshot file. It does not promise delivery of every publication, synchronized timing, remote hosting, authentication, or large media transfer.
+
+## Dependencies and licenses
+
+The C++ add-on uses only openFrameworks. The example bundles Apache ECharts 6.1.0 for offline use. Its Apache 2.0 license and NOTICE are included beside the browser asset.
+
+The add-on is MIT licensed. See `LICENSE`.
+
+## Next verification
+
+- Repeatedly read while OF replaces the snapshot and confirm that readers receive complete JSON. The initial macOS check completed 91,774 reads with no malformed JSON while sequence IDs advanced from 31 through 36.
+- Exercise startup and restart in every order: browser, server, and OF.
+- Measure publication cost at the documented 200-row workload.
+- Verify macOS first, then Windows replacement and retry behavior before claiming Windows support.
+
+The example currently compiles and links with openFrameworks 0.12.1 on macOS 26.7 using Apple clang 21.0.0. The local serving check used Python 3.13.7 and returned the HTML page, live 200-row snapshot, and bundled ECharts file successfully. The browser rendering pass displayed both series without console warnings. The restart matrix remains to be completed.
