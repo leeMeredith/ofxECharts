@@ -99,6 +99,24 @@ Every row must contain one value per unique dimension. Cells may contain strings
 
 `sequenceId` counts successful publications. A browser may skip IDs because polling and publication run independently; skipped IDs do not necessarily mean samples were lost because each snapshot can contain a history.
 
+## Performance
+
+The supplied 200-row example was measured on an Apple M4 MacBook Air with openFrameworks 0.12.1. It updates the dataset at 10 Hz, publishes at 2 Hz, and runs at 60 FPS with VSync. The table reports 100 publications after 10 warm-up publications.
+
+| Measurement | Release | Debug |
+| --- | ---: | ---: |
+| Mean complete publication | 0.457 ms | 0.926 ms |
+| 95th percentile publication | 0.629 ms | 1.237 ms |
+| Mean `setDataset()` validation and copy | 0.022 ms | 0.235 ms |
+| Estimated add-on CPU, as a percentage of one core | 0.13% | 0.44% |
+| Reported frame rate | 60.003 FPS | 60.002 FPS |
+
+No sustained frame-rate loss was observed. In Release, the 95th percentile publication used 3.8% of one 16.67 ms frame budget, on two frames per second. The browser, ECharts rendering, and static server run outside the OF process and are not included in the OF CPU estimate. Adding charts in the browser does not add another C++ publication or JSON request.
+
+With both publication and browser refresh set to 500 ms, a changed dataset normally appears after about 500 ms on average and within about 1 second in the worst phase alignment. The file operation itself is sub-millisecond on the tested machine. Payload size, storage, machine load, and publication frequency will change these results.
+
+See [the benchmark record](docs/benchmark.md) for the method, distributions, calculations, and scaling guidance.
+
 ## Current boundary
 
 The example is a local observation tool. The browser owns chart type, axes, series mappings, labels, and styling in `app.js`. The add-on knows only the dataset contract.
@@ -111,11 +129,11 @@ The C++ add-on uses only openFrameworks. The example bundles Apache ECharts 6.1.
 
 The add-on is MIT licensed. See `LICENSE`.
 
-## Next verification
+## Verification status
 
 - Repeatedly read while OF replaces the snapshot and confirm that readers receive complete JSON. The initial macOS check completed 91,774 reads with no malformed JSON while sequence IDs advanced from 31 through 36.
 - The macOS recovery matrix passed for OF and server restarts, first-snapshot waiting, paused and manual refresh, missing and invalid sources, shorter datasets, and empty datasets.
-- Measure publication cost at the documented 200-row workload.
+- The 200-row Release and Debug benchmark is recorded in `docs/benchmark.md`.
 - Verify macOS first, then Windows replacement and retry behavior before claiming Windows support.
 
 The example currently compiles and links with openFrameworks 0.12.1 on macOS 26.7 using Apple clang 21.0.0. The local serving check used Python 3.13.7 and returned the HTML page, live 200-row snapshot, and bundled ECharts file successfully. Browser rendering and the recovery matrix completed without console warnings.
