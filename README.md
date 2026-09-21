@@ -2,6 +2,8 @@
 
 First working implementation of a small openFrameworks companion for Apache ECharts. The OF side publishes a complete JSON snapshot. A separate static server exposes the snapshot and supplied browser example.
 
+![ofxECharts live dashboard](docs/dashboard.png)
+
 ```text
 openFrameworks → data.json → local static server → browser fetch() → ECharts
 ```
