@@ -10,7 +10,7 @@ This implementation intentionally contains no HTTP server, socket, cloud synchro
 
 ## Included example
 
-`example-json-line-chart` generates two signals, retains 200 samples, publishes every 500 ms, and displays them in OF and in an automatically updating ECharts page.
+`example-json-line-chart` generates two signals, retains 200 samples, publishes every 500 ms, and displays them in OF and in an automatically updating ECharts dashboard. The dashboard shows a time-series chart and a brightness-versus-movement scatter chart from the same snapshot and the same browser request.
 
 The publisher validates dimensions and rows, writes a temporary file in the destination directory, and replaces the public snapshot. Temporary Windows sharing failures are retried on later OF updates without sleeping on the main thread. Each successful publication receives a sequence ID and UTC timestamp.
 
@@ -31,6 +31,14 @@ The browser makes one request at a time, bypasses its cache, validates responses
 4. Open <http://127.0.0.1:8000/>.
 
 Opening `index.html` directly through `file://` will usually prevent the page from fetching `data.json`; use the local address.
+
+## Dashboard controls
+
+The dashboard accepts a same-origin JSON path or a full CORS-enabled URL in **Data source**. **Refresh** controls how often the browser requests that source; it does not change the OF publication interval. The available choices range from 250 ms through 5 seconds and include a paused state. The selected source and interval are reflected in the page URL so a view can be bookmarked.
+
+Each chart has an **Export PNG** action. **Print dashboard** opens the browser's print dialog for printing or saving the complete view as PDF. Exported image filenames include the snapshot sequence ID.
+
+Both supplied charts are described by the `chartConfigs` array near the beginning of `app.js`. Add another entry with a title, required dimensions, and an ECharts option builder to render a third chart. The shared poller validates and distributes one snapshot to every configured chart.
 
 ## Use it in a Project Generator app
 

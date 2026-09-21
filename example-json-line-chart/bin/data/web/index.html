@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ofxECharts — local data view</title>
+  <title>ofxECharts — local data dashboard</title>
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
   <main>
-    <header>
+    <header class="page-header">
       <div>
         <p class="eyebrow">OPENFRAMEWORKS / LOCAL JSON</p>
         <h1>Generated signals</h1>
@@ -19,6 +19,30 @@
       </div>
     </header>
 
+    <section class="controls" aria-label="Data connection controls">
+      <form id="connection-form">
+        <label class="source-control">
+          <span>Data source</span>
+          <input id="source-input" name="source" type="text" value="./data.json" spellcheck="false" autocomplete="off">
+        </label>
+        <label class="interval-control">
+          <span>Refresh</span>
+          <select id="poll-interval" name="poll">
+            <option value="250">Every 250 ms</option>
+            <option value="500" selected>Every 500 ms</option>
+            <option value="1000">Every 1 second</option>
+            <option value="2000">Every 2 seconds</option>
+            <option value="5000">Every 5 seconds</option>
+            <option value="0">Paused</option>
+          </select>
+        </label>
+        <button class="primary-button" type="submit">Apply</button>
+        <button id="refresh-now" type="button">Refresh now</button>
+        <button id="print-dashboard" type="button">Print dashboard</button>
+      </form>
+      <p>Use a same-origin path or a CORS-enabled URL. Refresh controls browser requests; openFrameworks publication remains independent.</p>
+    </section>
+
     <section class="metadata">
       <div><span>Sequence</span><strong id="sequence">—</strong></div>
       <div><span>Published</span><strong id="published">—</strong></div>
@@ -26,12 +50,10 @@
       <div><span>Unseen publications</span><strong id="unseen">0</strong></div>
     </section>
 
-    <section class="chart-card">
-      <div id="chart" role="img" aria-label="Line chart of generated openFrameworks values"></div>
-    </section>
+    <section id="charts" class="chart-grid" aria-label="Charts"></section>
 
     <footer>
-      Polling <code>data.json</code> every 500 ms. The last valid chart remains visible if updates stop.
+      Reading <code id="active-source">./data.json</code> <span id="active-rate">every 500 ms</span>. One request updates every chart.
     </footer>
   </main>
 
