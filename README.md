@@ -18,7 +18,12 @@ The browser makes one request at a time, bypasses its cache, validates responses
 
 ## Run the example
 
-1. Place or clone `ofxECharts` at `OF_ROOT/addons/ofxECharts`.
+1. Clone `ofxECharts` into the openFrameworks `addons` directory:
+
+   ```sh
+   cd OF_ROOT/addons
+   git clone https://github.com/leeMeredith/ofxECharts.git
+   ```
 2. Generate or open `example-json-line-chart` and run it.
 3. From the example directory, start a local server:
 

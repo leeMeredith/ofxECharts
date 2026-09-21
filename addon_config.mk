@@ -3,7 +3,7 @@ meta:
 	ADDON_DESCRIPTION = Publish openFrameworks data as JSON for local Apache ECharts views
 	ADDON_AUTHOR = Lee Meredith
 	ADDON_TAGS = "data" "json" "charts" "browser" "echarts"
-	ADDON_URL =
+	ADDON_URL = https://github.com/leeMeredith/ofxECharts
 
 common:
 	ADDON_DEPENDENCIES =
